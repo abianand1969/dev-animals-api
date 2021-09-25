@@ -3,7 +3,7 @@ const express = require("express")
 const app = express()
 
 app.get('/', (req, res) => {
-
+    res.addHeader("Access-Control-Allow-Origin", "*");
     // Sending the response
     res.send('Hello World!')
 
@@ -63,10 +63,12 @@ const users = [{
 ]
 
 app.get('/animals', (req, res) => {
+    res.addHeader("Access-Control-Allow-Origin", "*");
     res.send(animals)
 })
 
 app.get('/users', (req, res) => {
+    res.addHeader("Access-Control-Allow-Origin", "*");
     res.send(users)
 })
 
