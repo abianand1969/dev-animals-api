@@ -1,6 +1,35 @@
 const express = require("express")
+var bodyParser = require('body-parser')
+var mongoose = require('mongoose');
 
 const app = express()
+
+//parse application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(express.json())
+
+//Set up default mongoose connection
+var mongoDB = 'mongodb+srv://brainbeam:micron123@tainingcluster.wxbiw.mongodb.net/spantech';
+mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(
+        () => console.log('MongoDB Connected')
+    )
+    .catch(err => console.log("Error connecting MongoDB"))
+
+//Get the default connection
+var db = mongoose.connection;
+
+//Bind connection to error event (to get notification of connection errors)
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+db.on('open', () => {
+    console.log('Mongo DB Connection Success')
+})
+
+require('./models/User')
+const User = mongoose.model('users')
 
 app.get('/', (req, res) => {
     res.setHeader("Access-Control-Allow-Origin", "*")
@@ -70,6 +99,20 @@ app.get('/animals', (req, res) => {
 app.get('/users', (req, res) => {
     res.setHeader("Access-Control-Allow-Origin", "*")
     res.send(users)
+})
+
+app.post('/users', (req, res) => {
+    const newUser = {
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        password: req.body.password,
+        imgUrl: req.body.imgUrl
+    }
+    new User(newUser).save().then(user => {
+        console.log(user);
+        res.send(user)
+    })
 })
 
 const PORT = process.env.PORT || 5000
